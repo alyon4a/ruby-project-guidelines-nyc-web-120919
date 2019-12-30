@@ -15,7 +15,7 @@ class MenuController
     def login
         username = @prompt.ask('Enter username: ')
         password = @prompt.mask('Enter password: ')
-        user = User.find_by_username(username)
+        user = User.find_by(username: username)
         if user && user.password == password
             @user = user
             first_menu
@@ -32,7 +32,7 @@ class MenuController
     def create_account
         name = @prompt.ask('Enter your name: ')
         username = @prompt.ask('Enter a username: ')
-        while(User.find_by_username(username))
+        while(User.find_by(username: username))
             username = @prompt.ask('Username already exists please enter another username: ')
         end
         password = @prompt.mask('Enter a password: ')
@@ -97,6 +97,13 @@ class MenuController
         #get attractions created by the current user
         #go back to first menu after displaying all the attractions
         puts "My Attractions!"
+
+        @prompt.select("Select an attraction") do |menu|
+            Attraction.where('author_id = ?', @user.id).each do |attraction|
+                menu.choice attraction.name
+            end
+            menu.choice "Go back", -> { first_menu }
+        end
     end
 
     def my_reviews_menu
