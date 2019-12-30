@@ -39,26 +39,46 @@ class MenuController
     end
 
     def attractions_menu
+        #Select from all the attractions
+        #for the one that's selected puts details about it 
+        #and show choice: see all reviews or write a new review
+        #add "Go back" menu
         puts "Attractions!"
     end
 
     def cities_menu
+        #display all cities from all attractions
+        #select 1 city
+        #display all attractions for that city
+        #Go back
         puts "Cities!"
     end
 
     def new_attraction_menu
+        #prompt.ask
+        # :name
+        # :address
+        # :city    
+        # :description
+        # Create a new Attraction
+        # add current user id as :author_id
         puts "New Attraction!"
     end
 
     def my_attractions_menu
+        #get attractions created by the current user
+        #go back to first menu after displaying all the attractions
         puts "My Attractions!"
     end
 
     def my_reviews_menu
+        #get reviews created by the current user (display Attraction,Rating,Content)
+        #select a review or "Go Back"
+        #for the 1 selected review display full review and options: update, delete, go back
         puts "My reviews!"
     end
 
     def exit_menu
-        "Bye, have a good day!"
+        puts "Bye, have a good day!"
     end
 end
