@@ -2,9 +2,9 @@ User.delete_all
 Attraction.delete_all
 Review.delete_all
 
-user1 = User.create(name: "name", password: "123")
-alona_user = User.create(name: "Alona", password: "123")
-daniel_user = User.create(name: "Daniel", password: "123")
+user1 = User.create(name: "Tim Johns", username: "timmy", password: "123")
+alona_user = User.create(name: "Alona M", username: "alona", password: "123")
+daniel_user = User.create(name: "Daniel L", username: "daniel", password: "123")
 
 top_attraction = Attraction.create(name: "Top of The Rock", 
                   address: "30 Rockefeller Plaza", 
