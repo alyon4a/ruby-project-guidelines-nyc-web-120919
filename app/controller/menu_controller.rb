@@ -17,7 +17,13 @@ class MenuController
     end
 
     def create_account
-        puts "create"
+        name = @prompt.ask('Enter your name: ')
+        username = @prompt.ask('Enter a username: ')
+        while(User.find_by_username(username))
+            username = @prompt.ask('Username already exists please enter another username: ')
+        end
+        password = @prompt.mask('Enter a password: ')
+        User.create(name: name, username: username, password: password)
     end
 
 end
