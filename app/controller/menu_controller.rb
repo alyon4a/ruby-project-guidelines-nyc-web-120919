@@ -6,9 +6,9 @@ class MenuController
 
     def main_menu
         user_input = @prompt.select("Welcome") do |menu|
-            menu.choice 'Login', -> {login}
-            menu.choice 'Create Account', -> {create_account}
-            menu.choice 'Exit', -> {}
+            menu.choice 'Login', -> { login }
+            menu.choice 'Create Account', -> { create_account }
+            menu.choice 'Exit', -> { exit_menu }
         end
     end
 
@@ -22,8 +22,8 @@ class MenuController
         else
             @prompt.error("Username and password does not match")
             @prompt.select("") do |menu|
-                menu.choice "Try Again", -> {login}
-                menu.choice "Exit"
+                menu.choice "Try Again", -> {login }
+                menu.choice "Exit", -> { exit_menu }
             end
         end
     end
@@ -56,7 +56,13 @@ class MenuController
         #for the one that's selected puts details about it 
         #and show choice: see all reviews or write a new review
         #add "Go back" menu
-        puts "Attractions!"
+
+        @prompt.select("Select an attraction") do |menu|
+            Attraction.all.each do |attraction| 
+                menu.choice attraction.name
+            end
+            menu.choice "Go back", -> { first_menu }
+        end
     end
 
     def cities_menu
@@ -65,6 +71,13 @@ class MenuController
         #display all attractions for that city
         #Go back
         puts "Cities!"
+
+        @prompt.select("Select a city") do |menu|
+            Attraction.select(:city).distinct.each do |attraction|
+                menu.choice attraction.city
+            end
+            menu.choice "Go back", -> { first_menu}
+        end
     end
 
     def new_attraction_menu
