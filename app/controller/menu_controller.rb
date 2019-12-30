@@ -6,14 +6,9 @@ class MenuController
 
     def main_menu
         user_input = @prompt.select("Welcome") do |menu|
-            menu.choice 'Login', 1
-            menu.choice 'Create Account', 2
-            menu.choice 'Exit', 3
-        end
-        if user_input == 1
-            login
-        elsif user_input == 2
-            createAccount
+            menu.choice 'Login', -> {login}
+            menu.choice 'Create Account', -> {create_account}
+            menu.choice 'Exit', -> {}
         end
     end
 
@@ -21,7 +16,7 @@ class MenuController
         puts "login"
     end
 
-    def createAccount
+    def create_account
         puts "create"
     end
 
