@@ -13,7 +13,19 @@ class MenuController
     end
 
     def login
-        puts "login"
+        username = @prompt.ask('Enter username: ')
+        password = @prompt.mask('Enter password: ')
+        user = User.find_by_username(username)
+        if user && user.password == password
+            @user = user
+            first_menu
+        else
+            @prompt.error("Username and password does not match")
+            @prompt.select("") do |menu|
+                menu.choice "Try Again", -> {login}
+                menu.choice "Exit"
+            end
+        end
     end
 
     def create_account
@@ -23,7 +35,8 @@ class MenuController
             username = @prompt.ask('Username already exists please enter another username: ')
         end
         password = @prompt.mask('Enter a password: ')
-        User.create(name: name, username: username, password: password)
+        @user = User.create(name: name, username: username, password: password)
+        first_menu
     end
 
 
