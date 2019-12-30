@@ -1,7 +1,4 @@
 require_relative '../config/environment'
 
-
-
-puts "HELLO WORLD"
-
-#MenuController.new(user).main_menu
+prompt = TTY::Prompt.new
+MenuController.new(prompt).main_menu
