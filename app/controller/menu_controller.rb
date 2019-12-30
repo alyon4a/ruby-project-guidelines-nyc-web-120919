@@ -60,7 +60,7 @@ class MenuController
 
         @prompt.select("Select an attraction") do |menu|
             Attraction.all.each do |attraction| 
-                menu.choice attraction.name
+                menu.choice attraction.name, -> {select_attraction_menu(attraction)}
             end
             menu.choice "Go back", -> { first_menu }
         end
@@ -82,19 +82,11 @@ class MenuController
     end
 
     def new_attraction_menu
-        #prompt.ask
-        # :name
-        # :address
-        # :city    
-        # :description
-        # Create a new Attraction
-        # add current user id as :author_id
-        puts "New Attraction!"
-
         attraction = @prompt.collect do
             key(:name).ask("Enter an atttraction name")
             key(:address).ask("Enter the address of the attraction")
             key(:city).ask("Enter the city of the attraction")
+            key(:description).ask("How would you describe this attraction?")
         end
         attraction[:author_id] = @user.id
         Attraction.create(attraction)
@@ -112,6 +104,16 @@ class MenuController
         #select a review or "Go Back"
         #for the 1 selected review display full review and options: update, delete, go back
         puts "My reviews!"
+    end
+
+    def select_attraction_menu(attraction)
+        #print all attraction details
+        @prompt.select("What would you like to do for #{attraction.name}?") do |menu|
+            menu.choice "View all reviews", -> {  }
+            menu.choice "Write a review", -> { }
+            menu.choice "Go Back", -> { attractions_menu }
+            menu.choice "Exit", -> { exit_menu }
+        end
     end
 
     def exit_menu
