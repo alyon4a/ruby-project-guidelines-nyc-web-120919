@@ -52,14 +52,10 @@ class MenuController
         end
     end
 
-    def attractions_menu
-        #Select from all the attractions
-        #for the one that's selected puts details about it 
-        #and show choice: see all reviews or write a new review
-        #add "Go back" menu
-
+    def attractions_menu(arguments = nil)
+        filtered_attractions = arguments == nil ? Attraction.all : Attraction.where(arguments)
         @prompt.select("Select an attraction") do |menu|
-            Attraction.all.each do |attraction| 
+            filtered_attractions.each do |attraction| 
                 menu.choice attraction.name, -> {select_attraction_menu(attraction)}
             end
             menu.choice "Go back", -> { first_menu }
@@ -67,15 +63,9 @@ class MenuController
     end
 
     def cities_menu
-        #display all cities from all attractions
-        #select 1 city
-        #display all attractions for that city
-        #Go back
-        puts "Cities!"
-
         @prompt.select("Select a city") do |menu|
             Attraction.select(:city).distinct.each do |attraction|
-                menu.choice attraction.city
+                menu.choice attraction.city, -> {attractions_menu(city: attraction.city)}
             end
             menu.choice "Go back", -> { first_menu }
         end
@@ -94,13 +84,9 @@ class MenuController
     end
 
     def my_attractions_menu
-        #get attractions created by the current user
-        #go back to first menu after displaying all the attractions
-        puts "My Attractions!"
-
         @prompt.select("Select an attraction") do |menu|
             Attraction.where('author_id = ?', @user.id).each do |attraction|
-                menu.choice attraction.name
+                menu.choice attraction.name, -> {select_attraction_menu(attraction)}
             end
             menu.choice "Go back", -> { first_menu }
         end
@@ -116,9 +102,9 @@ class MenuController
     def select_attraction_menu(attraction)
         #print all attraction details
         @prompt.select("What would you like to do for #{attraction.name}?") do |menu|
-            menu.choice "View all reviews", -> {  }
-            menu.choice "Write a review", -> { }
-            menu.choice "Go Back", -> { attractions_menu }
+            menu.choice "View all reviews", -> {  } #helper method similar to my_reviews
+            menu.choice "Write a review", -> { } #helper method to write a review
+            menu.choice "Go Back", -> { first_menu }
             menu.choice "Exit", -> { exit_menu }
         end
     end
