@@ -22,7 +22,8 @@ class MenuController
         else
             @prompt.error("Username and password does not match")
             @prompt.select("") do |menu|
-                menu.choice "Try Again", -> {login }
+                menu.choice "Try Again", -> { login }
+                menu.choice "Create Account", -> { create_account }
                 menu.choice "Exit", -> { exit_menu }
             end
         end
@@ -76,7 +77,7 @@ class MenuController
             Attraction.select(:city).distinct.each do |attraction|
                 menu.choice attraction.city
             end
-            menu.choice "Go back", -> { first_menu}
+            menu.choice "Go back", -> { first_menu }
         end
     end
 
@@ -89,6 +90,15 @@ class MenuController
         # Create a new Attraction
         # add current user id as :author_id
         puts "New Attraction!"
+
+        attraction = @prompt.collect do
+            key(:name).ask("Enter an atttraction name")
+            key(:address).ask("Enter the address of the attraction")
+            key(:city).ask("Enter the city of the attraction")
+        end
+        attraction[:author_id] = @user.id
+        Attraction.create(attraction)
+        first_menu
     end
 
     def my_attractions_menu
