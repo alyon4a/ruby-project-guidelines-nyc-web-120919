@@ -48,7 +48,9 @@ class MenuController
             menu.choice "Create a new attraction", -> { new_attraction_menu }
             menu.choice "My attractions", -> { my_attractions_menu }
             menu.choice "My reviews", -> { my_reviews_menu }
-            menu.choice "Exit", -> { exit_menu }
+            menu.choice "Search by...", -> { search_menu }
+            menu.choice "
+            Exit", -> { exit_menu }
         end
     end
 
@@ -93,11 +95,6 @@ class MenuController
     end
 
     def my_reviews_menu
-        #get reviews created by the current user (display Attraction,Rating,Content)
-        #select a review or "Go Back"
-        #for the 1 selected review display full review and options: update, delete, go back
-        puts "My reviews!"
-
         rendered_table = create_review_table(@user.reviews).split("\n")
         
         @prompt.select("Select a review") do |menu|
@@ -175,6 +172,37 @@ class MenuController
             menu.choice "Edit this review", -> { update_review(review) } 
             menu.choice "Delete this review", -> { delete_review(review) } 
             menu.choice "Go Back", -> { first_menu }
+        end
+    end
+
+    def search_menu
+        @prompt.select("") do |menu|
+            menu.choice "Find all reviews by a user", -> { reviews_by_user }
+            menu.choice "Find all attractions created by a user", -> { attractions_by_user }
+            menu.choice "Go Back", -> { first_menu }
+        end
+    end
+
+    def reviews_by_user
+        author = find_a_user
+        puts create_review_table(author.reviews)
+        first_menu
+    end
+
+    def attractions_by_user
+        user = find_a_user
+        attractions_menu(author_id: user.id)
+    end
+
+    def find_a_user
+        username = @prompt.ask("What's the username for the author of the attractions?")
+        author = User.find_by(username: username)
+        if author == nil
+            puts "User not found, here are some usernames:"
+            User.all.each{|user| puts user.username}
+            find_a_user
+        else 
+            author
         end
     end
 
