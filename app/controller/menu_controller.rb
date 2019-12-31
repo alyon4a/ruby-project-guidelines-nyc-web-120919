@@ -45,12 +45,12 @@ class MenuController
         @prompt.select("") do |menu|
             menu.choice "View all attractions", -> { attractions_menu }
             menu.choice "View all cities", -> { cities_menu }
+            menu.choice "View top 3 attractions", -> { top_3_menu }
             menu.choice "Create a new attraction", -> { new_attraction_menu }
             menu.choice "My attractions", -> { my_attractions_menu }
             menu.choice "My reviews", -> { my_reviews_menu }
             menu.choice "Search by...", -> { search_menu }
-            menu.choice "
-            Exit", -> { exit_menu }
+            menu.choice "Exit", -> { exit_menu }
         end
     end
 
@@ -85,6 +85,39 @@ class MenuController
         first_menu
     end
 
+    def top_3_menu
+        attractions = get_top_3_attraction
+        rendered_table = create_attraction_table(attractions[0], attractions[1])
+        @prompt.select("Select an attraction") do |menu|
+            rendered_table.each_with_index do |row, index|
+                if index > 2 && index < rendered_table.length - 1
+                    menu.choice row, -> { select_attraction_menu(attractions[0][index - 3]) }
+                else
+                    menu.choice row, -> { puts "need something here" }, disabled: " "
+                end
+            end
+            menu.choice "Go back", -> { first_menu }
+        end
+    end
+
+    def get_top_3_attraction
+        result = []
+        attractions = Review.group(:attraction_id).average("rating").sort_by{ |_, v| -v }.first(3).to_h
+        attractions.keys.each do |id|
+            result.push(Attraction.find(id))
+        end
+        return [result, attractions.values]
+    end
+
+    def create_attraction_table(attractions, values)
+        table = TTY::Table.new ['Attraction', 'City', 'Author', 'Rating'], []
+        attractions.each_with_index do |attraction, index|
+            author = User.find(attraction.author_id)
+            table << [attraction.name, attraction.city, "#{author.name}(#{author.username})", values[index]]
+        end
+        return table.render(:ascii, alignments: [:left, :center]).split("\n")
+    end
+
     def my_attractions_menu
         @prompt.select("Select an attraction") do |menu|
             Attraction.where('author_id = ?', @user.id).each do |attraction|
@@ -95,7 +128,7 @@ class MenuController
     end
 
     def my_reviews_menu
-        rendered_table = create_review_table(@user.reviews).split("\n")
+        rendered_table = create_review_table(@user.reviews)
         
         @prompt.select("Select a review") do |menu|
             rendered_table.each_with_index do |row, index|
@@ -114,14 +147,15 @@ class MenuController
         reviews.each do |review|
             table << [review.attraction.name, review.attraction.city, review.rating, review.content]
         end
-        return table.render(:ascii, alignments: [:left, :center])
+        return table.render(:ascii, alignments: [:left, :center]).split("\n")
     end
 
     def select_attraction_menu(attraction)
+        puts attraction
         puts "========================"
-        puts attraction.name
+        @prompt.ok(attraction.name)
         puts "========================"
-        puts attraction.description
+        @prompt.warn(attraction.description)
         puts "Located at " + attraction.address + ", " + attraction.city
         
         @prompt.select("What would you like to do for #{attraction.name}?") do |menu|

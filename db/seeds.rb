@@ -35,9 +35,17 @@ address: "Geary & Powell str",
 city: "San Francisco", 
 description: "The main square of San Francisco")
 
+statue_liberty = Attraction.create(name: "Statue of Liberty",
+address: "New York, NY 10004",
+city: "New York",
+author_id: daniel_user.id,
+description: "Statue with torch")
+
 union_square.author_id = user1.id
 union_square.save
 
 Review.create(user_id: user1.id, attraction_id: top_attraction.id, rating: 4, content: "It was too high!")
+Review.create(user_id: daniel_user.id, attraction_id: top_attraction.id, rating: 5, content: "Nice")
 Review.create(user_id: alona_user.id, attraction_id: charging_bull.id, rating: 3, content: "Too many people waiting to take a picture!")
-Review.create(user_id: daniel_user.id, attraction_id: times_square.id, rating: 3, content: "Too crowded.")
+Review.create(user_id: daniel_user.id, attraction_id: times_square.id, rating: 2, content: "Too crowded.")
+Review.create(user_id: daniel_user.id, attraction_id: statue_liberty.id, rating: 3.5, content: "Long boat ride.")
