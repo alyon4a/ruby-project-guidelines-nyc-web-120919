@@ -113,6 +113,7 @@ class MenuController
             end
             menu.choice "Go back", -> { first_menu }
         end
+        first_menu
     end
 
     def select_attraction_menu(attraction)
