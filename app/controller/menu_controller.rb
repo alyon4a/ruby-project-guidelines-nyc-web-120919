@@ -153,24 +153,33 @@ class MenuController
     def my_reviews_menu
         rendered_table = create_review_table(@user.reviews)
         
-        @prompt.select("Select a review") do |menu|
-            rendered_table.each_with_index do |row, index|
-                if index > 2 && index < rendered_table.length - 1
-                    menu.choice row, -> { review_selected(@user.reviews[index - 3]) }
-                else
-                    menu.choice row, -> { puts "need something here" }, disabled: " "
+        if(rendered_table && rendered_table.length > 0)
+            @prompt.select("Select a review") do |menu|
+                rendered_table.each_with_index do |row, index|
+                    if index > 2 && index < rendered_table.length - 1
+                        menu.choice row, -> { review_selected(@user.reviews[index - 3]) }
+                    else
+                        menu.choice row, -> { puts "need something here" }, disabled: " "
+                    end
                 end
+                menu.choice "Go back", -> { first_menu }
             end
-            menu.choice "Go back", -> { first_menu }
+        else
+            @prompt.warn("There are no reviews")
         end
     end
 
     def create_review_table(reviews)
-        table = TTY::Table.new ['Attraction', 'City', 'Rating', 'Review'], []
-        reviews.each do |review|
-            table << [review.attraction.name, review.attraction.city, review.rating, review.content]
+        if(reviews && reviews.length > 0)
+            table = TTY::Table.new ['Attraction', 'City', 'Rating', 'Review'], []
+            reviews.each do |review|
+                table << [review.attraction.name, review.attraction.city, review.rating, review.content]
+            end
+            # binding.pry
+            return table.render(:ascii, alignments: [:left, :center]).split("\n")
+        else
+            return []
         end
-        return table.render(:ascii, alignments: [:left, :center]).split("\n")
     end
 
     def select_attraction_menu(attraction)
@@ -190,7 +199,12 @@ class MenuController
     end
 
     def view_all_reviews(attraction)
-        puts create_review_table(attraction.reviews)
+        table = create_review_table(attraction.reviews)
+        if(table && table.length > 0)
+            puts table
+        else
+            @prompt.warn("There are no reviews")
+        end
         first_menu
     end
 
