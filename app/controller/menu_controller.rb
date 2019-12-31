@@ -97,6 +97,22 @@ class MenuController
         #select a review or "Go Back"
         #for the 1 selected review display full review and options: update, delete, go back
         puts "My reviews!"
+        table = TTY::Table.new ['Attraction', 'City', 'Rating', 'Review'], []
+        @user.reviews.each do |review|
+            table << [review.attraction.name, review.attraction.city, review.rating, review.content]
+        end
+
+        rendered_table = table.render(:ascii, alignments: [:left, :center]).split("\n")
+        @prompt.select("Select a review") do |menu|
+            rendered_table.each_with_index do |row, index|
+                if index > 2 && index < rendered_table.length - 1
+                    menu.choice row, -> { puts @user.reviews[index - 3] }
+                else
+                    menu.choice row, -> { puts "need something here" }, disabled: " "
+                end
+            end
+            menu.choice "Go back", -> { first_menu }
+        end
     end
 
     def select_attraction_menu(attraction)
