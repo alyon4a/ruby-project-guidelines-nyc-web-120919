@@ -108,13 +108,23 @@ class MenuController
         
         @prompt.select("What would you like to do for #{attraction.name}?") do |menu|
             menu.choice "View all reviews", -> {  } #helper method similar to my_reviews
-            menu.choice "Write a review", -> { } #helper method to write a review
+            menu.choice "Write a review", -> { write_review(attraction) } #helper method to write a review
             menu.choice "Go Back", -> { first_menu }
             menu.choice "Exit", -> { exit_menu }
         end
     end
 
-
+    def write_review(attraction)
+        puts "New Review for #{attraction.name}"
+        review = @prompt.collect do
+            key(:rating).ask("Enter your rating 1 to 5")
+            key(:content).ask("Tell us your impression of this attraction?")
+        end
+        review[:user_id] = @user.id
+        review[:attraction_id] = attraction.id
+        Review.create(review)
+        first_menu
+    end
 
     def exit_menu
         puts "Bye, have a good day!"
