@@ -5,6 +5,29 @@ class MenuController
     end
 
     def main_menu
+        puts ("               `:oydNMMMNmdyo:`       
+            `+hMMMMMMMMMMMMMMMMh/`    
+          `oNMMMMMMMMMMMMMMMMMMMMm+`  
+         .dMMMMMMMMMMMMMMMMMMMMMMMMd. 
+        .mMMMMMMMMMMNmddmNMMMMMMMMMMm.
+        yMMMMMMMMMNs-    .+mMMMMMMMMMy
+        NMMMMMMMMM+        .NMMMMMMMMN
+        dMMMMMMMMM:        `NMMMMMMMMd
+        :MMMMMMMMMm:`     -hMMMMMMMMM:
+         +MMMMMMMMMMdysosdNMMMMMMMMM+ 
+          +NMMMMMMMMMMMMMMMMMMMMMMN+  
+           :NMMMMMMMMMMMMMMMMMMMMm:   
+            .dMMMMMMMMMMMMMMMMMMh.    
+             `sMMMMMMMMMMMMMMMN+`     
+               :mMMMMMMMMMMMMh-       
+                `sMMMMMMMMMN+`        
+                  :mMMMMMMy.          
+                   `oNMMd:            
+                     .y+`             
+             `+sdm:        :mds+`     
+             dMMMMMNhyssyhNMMMMMd     
+              -+yhmNNMMMMNNmhyo:"
+        )
         user_input = @prompt.select("Welcome") do |menu|
             menu.choice 'Login', -> { login }
             menu.choice 'Create Account', -> { create_account }
