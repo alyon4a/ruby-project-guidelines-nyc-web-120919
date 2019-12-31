@@ -211,7 +211,7 @@ class MenuController
     def write_review(attraction)
         puts "New Review for #{attraction.name}"
         review = @prompt.collect do
-            key(:rating).ask("Enter your rating 1 to 5")
+            key(:rating).ask("Enter your rating 1 to 5") { |q| q.validate(/^[1-5]$/, 'Enter new rating 1 to 5')}
             key(:content).ask("Tell us your impression of this attraction?")
         end
         review[:user_id] = @user.id
@@ -224,7 +224,7 @@ class MenuController
     def update_review(old_review)
         puts "Edit Review for #{old_review.attraction.name}"
         review = @prompt.collect do
-            key(:rating).ask("Enter new rating 1 to 5")
+            key(:rating).ask("Enter new rating 1 to 5") { |q| q.validate(/^[1-5]$/, 'Enter new rating 1 to 5')}
             key(:content).ask("Tell us your new impression of this attraction?")
         end
         old_review.rating = review[:rating]
