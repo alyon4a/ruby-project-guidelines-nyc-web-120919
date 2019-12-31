@@ -116,7 +116,12 @@ class MenuController
     end
 
     def select_attraction_menu(attraction)
-        #print all attraction details
+        puts "========================"
+        puts attraction.name
+        puts "========================"
+        puts attraction.description
+        puts "Located at " + attraction.address + ", " + attraction.city
+        
         @prompt.select("What would you like to do for #{attraction.name}?") do |menu|
             menu.choice "View all reviews", -> {  } #helper method similar to my_reviews
             menu.choice "Write a review", -> { } #helper method to write a review
@@ -124,6 +129,8 @@ class MenuController
             menu.choice "Exit", -> { exit_menu }
         end
     end
+
+
 
     def exit_menu
         puts "Bye, have a good day!"
