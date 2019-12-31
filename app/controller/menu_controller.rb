@@ -98,19 +98,18 @@ class MenuController
         #for the 1 selected review display full review and options: update, delete, go back
         puts "My reviews!"
 
-        rendered_table = create_review_table(@user.reviews).render(:ascii, alignments: [:left, :center]).split("\n")
+        rendered_table = create_review_table(@user.reviews).split("\n")
         
         @prompt.select("Select a review") do |menu|
             rendered_table.each_with_index do |row, index|
                 if index > 2 && index < rendered_table.length - 1
-                    menu.choice row, -> { puts @user.reviews[index - 3] }
+                    menu.choice row, -> { review_selected(@user.reviews[index - 3]) }
                 else
                     menu.choice row, -> { puts "need something here" }, disabled: " "
                 end
             end
             menu.choice "Go back", -> { first_menu }
         end
-        first_menu
     end
 
     def create_review_table(reviews)
@@ -118,7 +117,7 @@ class MenuController
         reviews.each do |review|
             table << [review.attraction.name, review.attraction.city, review.rating, review.content]
         end
-        return table
+        return table.render(:ascii, alignments: [:left, :center])
     end
 
     def select_attraction_menu(attraction)
@@ -129,11 +128,16 @@ class MenuController
         puts "Located at " + attraction.address + ", " + attraction.city
         
         @prompt.select("What would you like to do for #{attraction.name}?") do |menu|
-            menu.choice "View all reviews", -> {  } #helper method similar to my_reviews
-            menu.choice "Write a review", -> { write_review(attraction) } #helper method to write a review
+            menu.choice "View all reviews", -> { view_all_reviews(attraction) }
+            menu.choice "Write a review", -> { write_review(attraction) }
             menu.choice "Go Back", -> { first_menu }
             menu.choice "Exit", -> { exit_menu }
         end
+    end
+
+    def view_all_reviews(attraction)
+        puts create_review_table(attraction.reviews)
+        first_menu
     end
 
     def write_review(attraction)
@@ -145,7 +149,33 @@ class MenuController
         review[:user_id] = @user.id
         review[:attraction_id] = attraction.id
         Review.create(review)
+        @user.reviews.reload
         first_menu
+    end
+
+    def update_review(old_review)
+        puts "Edit Review for #{old_review.attraction.name}"
+        review = @prompt.collect do
+            key(:rating).ask("Enter new rating 1 to 5")
+            key(:content).ask("Tell us your new impression of this attraction?")
+        end
+        old_review.rating = review[:rating]
+        old_review.content = review[:content]
+        old_review.save
+        first_menu
+    end
+
+    def delete_review(review)
+        @user.reviews.delete(review)
+        first_menu
+    end
+
+    def review_selected(review)
+        @prompt.select("What would you like to do for your review of #{review.attraction.name}?") do |menu|
+            menu.choice "Edit this review", -> { update_review(review) } 
+            menu.choice "Delete this review", -> { delete_review(review) } 
+            menu.choice "Go Back", -> { first_menu }
+        end
     end
 
     def exit_menu
