@@ -5,7 +5,7 @@ class MenuController
     end
 
     def main_menu
-        puts ("               `:oydNMMMNmdyo:`       
+        puts ("`:oydNMMMNmdyo:`       
             `+hMMMMMMMMMMMMMMMMh/`    
           `oNMMMMMMMMMMMMMMMMMMMMm+`  
          .dMMMMMMMMMMMMMMMMMMMMMMMMd. 
@@ -72,6 +72,7 @@ class MenuController
             menu.choice "Create a new attraction", -> { new_attraction_menu }
             menu.choice "My attractions", -> { my_attractions_menu }
             menu.choice "My reviews", -> { my_reviews_menu }
+            menu.choice "My wish list", -> { my_wishlist_menu }
             menu.choice "Search by...", -> { search_menu }
             menu.choice "Exit", -> { exit_menu }
         end
@@ -167,6 +168,34 @@ class MenuController
         else
             @prompt.warn("There are no reviews")
         end
+    end
+
+    def my_wishlist_menu
+        @prompt.select("") do |menu|
+            menu.choice "View my wish list", -> { view_wishlist }
+            menu.choice "Add to wish list", -> { add_to_wishlist }
+            menu.choice "Delete from wish list", -> { delete_from_wish_list }
+            menu.choice "Go back", -> { first_menu }
+        end
+    end
+
+    def view_wishlist
+        @prompt.select("Select an attraction") do |menu|
+            @user.wish_list.each do |attraction|
+                menu.choice attraction.name, -> {select_attraction_menu(attraction)}
+            end
+            menu.choice "Go back", -> { my_wishlist_menu }
+        end
+    end
+
+    def add_to_wishlist
+        puts "add to wish list"
+        first_menu
+    end
+
+    def delete_from_wish_list
+        puts "delete from wish list"
+        first_menu
     end
 
     def create_review_table(reviews)

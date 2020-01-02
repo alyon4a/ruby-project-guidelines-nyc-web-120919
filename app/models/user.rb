@@ -5,9 +5,10 @@ class User < ActiveRecord::Base
     has_many :reviews
     has_many :attractions, through: :reviews
     has_many :attraction_likes
+    has_many :wish_list_items
     
     def wish_list
-        WishListItem.select(user_id: self.id).map{|wl_item| wl_item.attraction}
+        wish_list_items.map{|wl_item| wl_item.attraction}
     end
 
     def add_to_wish_list(attraction)
