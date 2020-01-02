@@ -181,7 +181,7 @@ class MenuController
             @user.wish_list.each do |attraction|
                 menu.choice attraction.name, -> {select_attraction_menu(attraction)}
             end
-            menu.choice "Go back", -> { firsrt_menu }
+            menu.choice "Go back", -> { first_menu }
         end
     end
 
