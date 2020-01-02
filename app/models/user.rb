@@ -1,7 +1,10 @@
 require_relative 'wish_list_item'
+require_relative "attractionLike"
+
 class User < ActiveRecord::Base
     has_many :reviews
     has_many :attractions, through: :reviews
+    has_many :attraction_likes
     
     def wish_list
         WishListItem.select(user_id: self.id).map{|wl_item| wl_item.attraction}
@@ -16,4 +19,9 @@ class User < ActiveRecord::Base
         WishListItem.delete(user_id: self.id, attraction_id: attraction.id)
         self.reload
     end
+
+    def likes
+        AttractionLike.where("user_id=?", self.id)
+    end
 end
+
