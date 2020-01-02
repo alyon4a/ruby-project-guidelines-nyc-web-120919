@@ -221,7 +221,12 @@ class MenuController
         @prompt.select("What would you like to do for #{attraction.name}?") do |menu|
             menu.choice "View all reviews", -> { view_all_reviews(attraction) }
             menu.choice "Write a review", -> { write_review(attraction) }
-            menu.choice "Like Attraction", -> { like_attraction(attraction)}
+            like = AttractionLike.find_by(attraction_id: attraction.id, user_id: @user.id)
+            if(like)
+                menu.choice "Unlike Attraction", -> { unlike_attraction(like)}
+            else
+                menu.choice "Like Attraction", -> { like_attraction(attraction)}
+            end
             menu.choice "Go Back", -> { first_menu }
             menu.choice "Exit", -> { exit_menu }
         end
@@ -252,6 +257,14 @@ class MenuController
 
     def like_attraction(attraction)
         AttractionLike.create(user_id: @user.id, attraction_id: attraction.id)
+        @user.attraction_likes.reload
+        first_menu
+    end
+
+    def unlike_attraction(like)
+        AttractionLike.delete(like.id)
+        @user.attraction_likes.reload
+        first_menu
     end
 
     def update_review(old_review)
