@@ -177,31 +177,12 @@ class MenuController
     end
 
     def my_wishlist_menu
-        @prompt.select("") do |menu|
-            menu.choice "View my wish list", -> { view_wishlist }
-            menu.choice "Add to wish list", -> { add_to_wishlist }
-            menu.choice "Delete from wish list", -> { delete_from_wish_list }
-            menu.choice "Go back", -> { first_menu }
-        end
-    end
-
-    def view_wishlist
         @prompt.select("Select an attraction") do |menu|
             @user.wish_list.each do |attraction|
                 menu.choice attraction.name, -> {select_attraction_menu(attraction)}
             end
-            menu.choice "Go back", -> { my_wishlist_menu }
+            menu.choice "Go back", -> { first_menu }
         end
-    end
-
-    def add_to_wishlist
-        puts "add to wish list"
-        first_menu
-    end
-
-    def delete_from_wish_list
-        puts "delete from wish list"
-        first_menu
     end
 
     def liked_attractions_menu
@@ -259,6 +240,12 @@ class MenuController
             else
                 menu.choice "Like Attraction", -> { like_attraction(attraction)}
             end
+            wish_list_item = WishListItem.find_by(user_id: @user.id, attraction_id: attraction.id)
+            if (wish_list_item)
+                menu.choice "Remove from my wish list", -> { remove_attraction_from_wishlist(wish_list_item)}
+            else
+                menu.choice "Add to my wish list", -> { add_attraction_to_wishlist(attraction)}
+            end
             menu.choice "Go Back", -> { first_menu }
             menu.choice "Exit", -> { exit_menu }
         end
@@ -280,10 +267,7 @@ class MenuController
             key(:rating).ask("Enter your rating 1 to 5") { |q| q.validate(/^[1-5]$/, 'Enter new rating 1 to 5')}
             key(:content).ask("Tell us your impression of this attraction?")
         end
-        review[:user_id] = @user.id
-        review[:attraction_id] = attraction.id
-        Review.create(review)
-        @user.reviews.reload
+        attraction.add_review(review, @user)
         first_menu
     end
 
@@ -298,6 +282,17 @@ class MenuController
         @user.attraction_likes.reload
         first_menu
     end
+
+    def add_attraction_to_wishlist(attraction)
+        @user.add_to_wish_list(attraction)
+        first_menu
+    end
+
+    def remove_attraction_from_wishlist(wl_item)
+        @user.delete_from_wish_list(wl_item)
+        first_menu
+    end
+
 
     def update_review(old_review)
         puts "Edit Review for #{old_review.attraction.name}"

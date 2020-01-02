@@ -16,9 +16,9 @@ class User < ActiveRecord::Base
         self.reload
     end
 
-    def delete_from_wish_list(attraction)
-        WishListItem.delete(user_id: self.id, attraction_id: attraction.id)
-        self.reload
+    def delete_from_wish_list(wl_item)
+        WishListItem.delete(wl_item.id)
+        self.wish_list_items.reload
     end
 
     def likes
