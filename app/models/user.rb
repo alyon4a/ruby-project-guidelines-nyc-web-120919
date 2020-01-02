@@ -21,7 +21,7 @@ class User < ActiveRecord::Base
     end
 
     def likes
-        self.attraction_likes.map {|likes| Attraction.find(likes.attraction_id)}
+        self.attraction_likes.map {|likes| likes.attraction}
     end
 end
 
