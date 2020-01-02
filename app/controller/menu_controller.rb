@@ -246,6 +246,9 @@ class MenuController
         puts "========================"
         @prompt.warn(attraction.description)
         puts "Located at " + attraction.address + ", " + attraction.city
+        puts "========================"
+        puts "Wikipedia description:"
+        puts Wikipedia.find(attraction.name).summary
         
         @prompt.select("What would you like to do for #{attraction.name}?") do |menu|
             menu.choice "View all reviews", -> { view_all_reviews(attraction) }
