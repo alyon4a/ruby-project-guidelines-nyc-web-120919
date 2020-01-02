@@ -72,6 +72,7 @@ class MenuController
             menu.choice "Create a new attraction", -> { new_attraction_menu }
             menu.choice "My attractions", -> { my_attractions_menu }
             menu.choice "My reviews", -> { my_reviews_menu }
+            menu.choice "Attractions liked", -> { liked_attractions_menu }
             menu.choice "Search by...", -> { search_menu }
             menu.choice "Exit", -> { exit_menu }
         end
@@ -110,7 +111,11 @@ class MenuController
 
     def top_3_menu
         attractions = get_top_3_attraction
-        rendered_table = create_attraction_table(attractions[0], attractions[1])
+        rendered_table = create_attraction_table(attractions[0], attractions[1], attractions[2])
+        display_attractions(attractions, rendered_table)
+    end
+
+    def display_attractions(attractions, rendered_table)
         @prompt.select("Select an attraction") do |menu|
             rendered_table.each_with_index do |row, index|
                 if index > 2 && index < rendered_table.length - 1
@@ -125,18 +130,19 @@ class MenuController
 
     def get_top_3_attraction
         result = []
-        attractions = Review.group(:attraction_id).average("rating").sort_by{ |_, v| -v }.first(3).to_h
-        attractions.keys.each do |id|
+        attractions_rating = Review.group(:attraction_id).average("rating").sort_by{ |_, v| -v }.first(3).to_h
+        attractions_likes = AttractionLike.group(:attraction_id).count
+        attractions_rating.keys.each do |id|
             result.push(Attraction.find(id))
         end
-        return [result, attractions.values]
+        return [result, attractions_rating.values, attractions_likes.values]
     end
 
-    def create_attraction_table(attractions, values)
-        table = TTY::Table.new ['Attraction', 'City', 'Author', 'Rating'], []
+    def create_attraction_table(attractions, rating, likes)
+        table = TTY::Table.new ['Attraction', 'City', 'Author', 'Rating', 'Likes'], []
         attractions.each_with_index do |attraction, index|
             author = User.find(attraction.author_id)
-            table << [attraction.name, attraction.city, "#{author.name}(#{author.username})", values[index]]
+            table << [attraction.name, attraction.city, "#{author.name}(#{author.username})", rating[index], likes[index]]
         end
         return table.render(:ascii, alignments: [:left, :center]).split("\n")
     end
@@ -169,6 +175,28 @@ class MenuController
         end
     end
 
+    def liked_attractions_menu
+        attractions = get_liked_attractions
+        rendered_table = create_attraction_table(attractions[0], attractions[1], attractions[2])
+        display_attractions(attractions, rendered_table)
+    end
+
+    def get_liked_attractions
+        result = []
+        rating = []
+        likes = []
+        attractions_rating = Review.group(:attraction_id).average("rating")
+        attractions_likes = AttractionLike.group(:attraction_id).count
+        attractions_rating.keys.each do |id|
+            if(@user.attraction_likes.find{|likes| likes.attraction_id == id})
+                result.push(Attraction.find(id))
+                rating.push(attractions_rating[id])
+                likes.push(attractions_likes[id])
+            end
+        end
+        return [result, rating, likes]
+    end
+
     def create_review_table(reviews)
         if(reviews && reviews.length > 0)
             table = TTY::Table.new ['Attraction', 'City', 'Rating', 'Review'], []
@@ -193,6 +221,7 @@ class MenuController
         @prompt.select("What would you like to do for #{attraction.name}?") do |menu|
             menu.choice "View all reviews", -> { view_all_reviews(attraction) }
             menu.choice "Write a review", -> { write_review(attraction) }
+            menu.choice "Like Attraction", -> { like_attraction(attraction)}
             menu.choice "Go Back", -> { first_menu }
             menu.choice "Exit", -> { exit_menu }
         end
@@ -219,6 +248,10 @@ class MenuController
         Review.create(review)
         @user.reviews.reload
         first_menu
+    end
+
+    def like_attraction(attraction)
+        AttractionLike.create(user_id: @user.id, attraction_id: attraction.id)
     end
 
     def update_review(old_review)
