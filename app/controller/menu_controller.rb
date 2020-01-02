@@ -5,7 +5,7 @@ class MenuController
     end
 
     def main_menu
-        puts ("`:oydNMMMNmdyo:`       
+        puts ("              `:oydNMMMNmdyo:`       
             `+hMMMMMMMMMMMMMMMMh/`    
           `oNMMMMMMMMMMMMMMMMMMMMm+`  
          .dMMMMMMMMMMMMMMMMMMMMMMMMd. 
@@ -202,6 +202,8 @@ class MenuController
     def delete_from_wish_list
         puts "delete from wish list"
         first_menu
+    end
+
     def liked_attractions_menu
         attractions = get_liked_attractions
         rendered_table = create_attraction_table(attractions[0], attractions[1], attractions[2])
