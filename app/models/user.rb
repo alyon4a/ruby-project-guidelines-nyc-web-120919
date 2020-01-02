@@ -22,7 +22,7 @@ class User < ActiveRecord::Base
     end
 
     def likes
-        AttractionLike.where("user_id=?", self.id)
+        self.attraction_likes.map {|likes| likes.attraction}
     end
 end
 

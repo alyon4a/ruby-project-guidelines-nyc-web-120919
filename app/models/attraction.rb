@@ -4,6 +4,6 @@ class Attraction < ActiveRecord::Base
 
     has_many :attraction_likes
     def user_likes
-        AttractionLike.where("attraction_id=?", self.id)
+        self.attraction_likes.map{|likes| likes.user}
     end
 end
