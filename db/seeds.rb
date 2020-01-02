@@ -49,3 +49,4 @@ Review.create(user_id: daniel_user.id, attraction_id: top_attraction.id, rating:
 Review.create(user_id: alona_user.id, attraction_id: charging_bull.id, rating: 3, content: "Too many people waiting to take a picture!")
 Review.create(user_id: daniel_user.id, attraction_id: times_square.id, rating: 2, content: "Too crowded.")
 Review.create(user_id: daniel_user.id, attraction_id: statue_liberty.id, rating: 3.5, content: "Long boat ride.")
+
